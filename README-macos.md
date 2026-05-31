@@ -436,6 +436,46 @@ myia-openwebui   Up X minutes (healthy)    0.0.0.0:3000->8080/tcp
 
 ---
 
+### Étape 6b — Tester avec Ollama en attendant la clé AMUE
+
+Si tu n'as pas encore ta clé Mistral AMUE, tu peux utiliser un modèle local via Ollama.
+
+**Installer Ollama**
+```bash
+brew install ollama
+```
+
+**Démarrer Ollama** — laisser ce terminal ouvert :
+```bash
+ollama serve
+```
+
+**Télécharger un modèle léger** dans un second terminal :
+```bash
+ollama pull qwen3:0.6b
+```
+
+**Activer le modèle dans LiteLLM** — décommenter la section Ollama dans `config/litellm_config.yaml` :
+```yaml
+  - model_name: qwen3
+    litellm_params:
+      model: ollama/qwen3:0.6b
+      api_base: http://host.docker.internal:11434
+    model_info:
+      description: "Qwen3 0.6b — modèle local via Ollama"
+```
+
+**Redémarrer LiteLLM** :
+```bash
+docker compose -f docker-compose.macos.yml restart litellm
+```
+
+Le modèle `qwen3` apparaît dans le menu déroulant d'OpenWebUI.
+
+> **Note mémoire** : `qwen3:0.6b` (500 Mo) et `nomic-embed-text` (292 Mo) coexistent sans problème sur M2 16 Go. Éviter `qwen3:1.7b` — trop gourmand en parallèle.
+
+---
+
 ## 4. Vérifier que tout fonctionne
 
 Identique à la version Linux — même commandes, même script.
