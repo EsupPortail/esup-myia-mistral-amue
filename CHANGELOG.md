@@ -24,7 +24,7 @@
 
 ## [0.1.0] - 2026-04-16
 ### Ajouté
-- Version initiale générée sur Claude.ai — Nicolas Truchaud (Université de Strasbourg)
+- Version initiale générée sur Claude.ai — Nicolas Truchaud (Université de la Polynésie Française)
 - Tutoriel Linux Ubuntu/Debian — `README.md`
 - `docker-compose.yml` avec PostgreSQL, Redis, LiteLLM, OpenWebUI
 - `config/litellm_config.yaml` avec modèles Mistral AMUE
