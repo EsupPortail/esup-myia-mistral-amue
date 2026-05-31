@@ -1,4 +1,4 @@
-# Déployer un clone de ChatGPT souverain dans le cadre de l'expérimentation Mistral AMUE
+# Déployer votre IA souveraine dans le cadre de l'expérimentation Mistral AMUE
 
 > ⚠️ **VERSION DE TRAVAIL — contenu non encore validé**
 > Le présent document est un document de travail non encore validé par nos équipes. Merci d'attendre sa finalisation avant de l'appliquer chez vous.
