@@ -2,7 +2,7 @@
 
 Stack open source pour déployer une interface type ChatGPT souveraine dans l'enseignement supérieur français, basée sur l'offre Mistral AMUE.
 
-> **Basé sur les Ateliers IA Esup 2025/2026** — Université de Strasbourg / Université de la Polynésie Française / Université de Rennes
+> **Basé sur les Ateliers IA Esup 2025/2026** — Université de Strasbourg ([Morgan Bohn](https://github.com/dotmobo)) / Université de la Polynésie Française ([Nicolas Truchaud](https://github.com/nicktruch))
 
 ---
 
