@@ -1,0 +1,98 @@
+# Version macOS Apple Silicon (M2/M3)
+# Usage : docker compose -f docker-compose.macos.yml up -d
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    platform: linux/arm64
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ${VOL_DATA_POSTGRES:-./data/postgres}:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - nw_llm
+
+  redis:
+    image: redis:7-alpine
+    platform: linux/arm64
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD} --save 60 1
+    volumes:
+      - ${VOL_DATA_REDIS:-./data/redis}:/data
+    networks:
+      - nw_llm
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    restart: unless-stopped
+    ports:
+      - "${PORT_LITELLM:-4000}:4000"
+    environment:
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      LITELLM_SECRET: ${LITELLM_SECRET_KEY}
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      STORE_MODEL_IN_DB: "True"
+    volumes:
+      - ./config/litellm_config.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nw_llm
+    # Pas de healthcheck : les migrations Prisma prennent ~3min sur M2
+    # OpenWebUI démarre avec service_started ci-dessous
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    ports:
+      - "${PORT_OWUI:-3000}:8080"
+    environment:
+      OPENAI_API_BASE_URL: http://litellm:4000/v1
+      OPENAI_API_KEY: ${LITELLM_MASTER_KEY}
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
+      WEBUI_NAME: ${WEBUI_NAME}
+      WEBUI_URL: ${WEBUI_URL}
+      DEFAULT_MODELS: "mistral-large"
+      # ⚠️ Mettre "true" pour créer le premier compte admin, puis repasser à "false"
+      ENABLE_SIGNUP: "false"
+      RAG_EMBEDDING_ENGINE: "openai"
+      RAG_EMBEDDING_MODEL: "mistral-embed"
+      RAG_OPENAI_API_BASE_URL: http://litellm:4000/v1
+      RAG_OPENAI_API_KEY: ${LITELLM_MASTER_KEY}
+      SCARF_NO_ANALYTICS: "true"
+      DO_NOT_TRACK: "true"
+      ANONYMIZED_TELEMETRY: "false"
+    volumes:
+      - ${VOL_DATA_OPENWEBUI:-./data/openwebui}:/app/backend/data
+    depends_on:
+      litellm:
+        condition: service_started
+    networks:
+      - nw_llm
+
+networks:
+  nw_llm:
+    driver: bridge

@@ -1,0 +1,72 @@
+general_settings:
+  store_model_in_db: true
+  disable_end_user_cost_tracking: true
+
+litellm_settings:
+  num_retries: 3
+  request_timeout: 3600
+  allowed_fails: 5
+  cooldown_time: 30
+  drop_params: true
+  cache: true
+  cache_params:
+    type: redis
+    host: redis
+    port: 6379
+    password: os.environ/REDIS_PASSWORD
+
+model_list:
+
+  # Mistral Large — modèle principal, le plus capable
+  - model_name: mistral-large
+    litellm_params:
+      model: mistral/mistral-large-latest
+      api_key: os.environ/MISTRAL_API_KEY
+      api_base: https://api.mistral.ai/v1        # remplacer si endpoint AMUE dédié
+    model_info:
+      max_tokens: 131072
+      max_input_tokens: 128000
+      max_output_tokens: 4096
+      description: "Mistral Large — modèle puissant (AMUE)"
+
+  # Mistral Small — plus rapide, moins coûteux
+  - model_name: mistral-small
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
+      api_base: https://api.mistral.ai/v1
+    model_info:
+      max_tokens: 32768
+      max_input_tokens: 32000
+      max_output_tokens: 4096
+      description: "Mistral Small — rapide et économique (AMUE)"
+
+  # Codestral — spécialisé code
+  - model_name: codestral
+    litellm_params:
+      model: mistral/codestral-latest
+      api_key: os.environ/MISTRAL_API_KEY
+      api_base: https://api.mistral.ai/v1
+    model_info:
+      max_tokens: 32768
+      description: "Codestral — assistance à la programmation (AMUE)"
+
+  # Mistral Embed — embeddings pour le RAG
+  - model_name: mistral-embed
+    litellm_params:
+      model: mistral/mistral-embed
+      api_key: os.environ/MISTRAL_API_KEY
+      api_base: https://api.mistral.ai/v1
+    model_info:
+      mode: embedding
+      description: "Embeddings Mistral pour le RAG"
+
+  # Modèle local via Ollama — utilisable sans clé AMUE
+  # Sur Linux : remplacer host.docker.internal par l'IP de l'hôte (ex: 172.17.0.1)
+  # Sur macOS : host.docker.internal fonctionne nativement avec Docker Desktop
+  # - model_name: qwen3
+  #   litellm_params:
+  #     model: ollama/qwen3:0.6b
+  #     api_base: http://host.docker.internal:11434
+  #   model_info:
+  #     description: "Qwen3 0.6b — modèle local via Ollama"
