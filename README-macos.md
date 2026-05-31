@@ -1,4 +1,4 @@
-# Déployer un clone de ChatGPT souverain dans le cadre de l'expérimentation Mistral AMUE
+# Déployer votre IA souveraine dans le cadre de l'expérimentation Mistral AMUE
 ## Version maquette locale — macOS Apple Silicon (M2)
 
 > ✅🍎 **VERSION VALIDÉE SUR MACOS**
