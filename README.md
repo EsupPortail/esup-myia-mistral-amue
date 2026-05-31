@@ -2,7 +2,7 @@
 
 Stack open source pour déployer une interface type ChatGPT souveraine dans l'enseignement supérieur français, basée sur l'offre Mistral AMUE.
 
-> **Basé sur les Ateliers IA Esup 2025/2026** — Université de Rennes / Université de Strasbourg
+> **Basé sur les Ateliers IA Esup 2025/2026** — Université de Strasbourg / Université de la Polynésie Française / Université de Rennes
 
 ---
 
@@ -125,7 +125,7 @@ ollama pull qwen3:0.6b
 
 | Date | Auteur | Modification |
 |---|---|---|
-| 16 avr. 2026 | Nicolas Truchaud (Univ. Strasbourg) | Version initiale |
+| 16 avr. 2026 | Nicolas Truchaud (Université de la Polynésie Française) | Version initiale |
 | 20 mai 2026 | David Boit | OS Debian, doc Docker officielle, ports/volumes dans .env, réseau nw_llm |
 | 30 mai 2026 | Nicolas Truchaud | Corrections config LiteLLM, healthchecks, ENABLE_SIGNUP, support Ollama, tutoriel macOS M2 |
 
