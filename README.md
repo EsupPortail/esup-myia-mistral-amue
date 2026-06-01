@@ -1,6 +1,6 @@
 # MyIA — votre IA souveraine basée sur l'infrastructure Mistral AMUE
 
-Stack open source pour déployer une interface type ChatGPT ou Claude souveraine dans l'enseignement supérieur français, basée sur l'offre Mistral AMUE.
+Stack open source pour déployer une IA souveraine type ChatGPT ou Claude, basée sur l'offre Mistral AMUE pour l'enseignement supérieur français.
 
 > **Basé sur les Ateliers IA Esup 2025/2026** — Université de Strasbourg ([Morgan Bohn](https://github.com/dotmobo)) / Université de la Polynésie Française ([Nicolas Truchaud](https://github.com/nicktruch))
 
@@ -13,8 +13,8 @@ Stack open source pour déployer une interface type ChatGPT ou Claude souveraine
 | [Mistral AI](https://mistral.ai) | Modèles LLM souverains (via clé AMUE) |
 | [LiteLLM](https://litellm.ai) | Passerelle API, quotas, load-balancing |
 | [OpenWebUI](https://github.com/open-webui/open-webui) | Interface utilisateur type ChatGPT |
-| PostgreSQL | Persistance logs, budgets, clés |
-| Redis | Cache des requêtes |
+| [PostgreSQL](https://www.postgresql.org) | Persistance logs, budgets, clés |
+| [Redis](https://redis.io) | Cache des requêtes |
 
 ---
 
