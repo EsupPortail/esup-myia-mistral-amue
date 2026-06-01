@@ -1,8 +1,8 @@
 # Déployer votre IA souveraine dans le cadre de l'expérimentation Mistral AMUE
 
 > ⚠️ **VERSION DE TRAVAIL — contenu non encore validé**
-> Le présent document est un document de travail non encore validé par nos équipes. Merci d'attendre sa finalisation avant de l'appliquer chez vous.
-> *La version initiale de cette proposition a été générée sur Claude.ai puis travaillée par des humains.*
+> Le présent document est un document de travail en cours de test au sein des équipes d'Esup.
+> N'hésitez pas à nous faire remonter vos questions ou remarques dans les [issues github](https://github.com/EsupPortail/esup-myia-mistral-amue/issues) associées à ce projet.
 
 | Date | Auteur | Modification | Validation |
 |---|---|---|---|
@@ -12,6 +12,8 @@
 ---
 
 > **Contexte** : Ce tutoriel s'appuie sur les Ateliers IA Esup 2025/2026 (Université de Rennes / Université de Strasbourg) pour assembler une stack complète type ChatGPT souverain. Le choix architectural retenu ici est d'utiliser l'API Mistral via la clé négociée par l'AMUE pour l'enseignement supérieur français — ce qui permet de démarrer sans infrastructure GPU et avec un haut niveau de souveraineté (données hébergées en Europe, opérateur français). Si votre établissement dispose de GPU et souhaite une indépendance totale vis-à-vis de toute API externe, la brique Mistral API peut être remplacée par un moteur vLLM local — la configuration est décrite dans l'Atelier 2 Esup.
+>
+> Si vous disposez d'une clé Mistral hors accord AMUE, vous pouvez a priori l'utiliser en lieu et place de la clé Mistral-AMUE dans votre fichier `.env`. Dans la configuration LiteLLM, l'api_base reste identique : `api_base: https://api.mistral.ai/v1`
 
 ---
 
