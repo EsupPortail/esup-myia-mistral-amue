@@ -147,7 +147,7 @@ docker compose version    # Docker Compose version v2+
 ### Étape 2 — Cloner le repo
 
 ```bash
-git clone https://github.com/nicktruch/esup-myia-mistral-amue.git ~/myia
+git clone https://github.com/EsupPortail/esup-myia-mistral-amue.git ~/myia
 cd ~/myia
 
 # Créer les répertoires de données

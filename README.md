@@ -22,7 +22,7 @@ Stack open source pour déployer une IA souveraine type ChatGPT ou Claude, basé
 
 ```bash
 # 1. Cloner le repo
-git clone https://github.com/nicktruch/esup-myia-mistral-amue.git
+git clone https://github.com/EsupPortail/esup-myia-mistral-amue.git
 cd esup-myia-mistral-amue
 
 # 2. Copier et remplir le fichier de config
