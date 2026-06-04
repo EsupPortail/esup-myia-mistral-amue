@@ -47,7 +47,10 @@ services:
     ports:
       - "${PORT_LITELLM:-4000}:4000"
     environment:
+      # Endpoint ILaaS AMUE — https://llm.ilaas.fr/v1 (voir litellm_config.yaml)
       ILAAS_API_KEY: ${ILAAS_API_KEY}
+      # Pour clé Mistral standard (hors AMUE/ILaaS) : commenter la ligne ci-dessus et décommenter :
+      # MISTRAL_API_KEY: ${MISTRAL_API_KEY}
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
       LITELLM_SECRET: ${LITELLM_SECRET_KEY}
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
@@ -80,7 +83,7 @@ services:
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
       WEBUI_NAME: ${WEBUI_NAME}
       WEBUI_URL: ${WEBUI_URL}
-      DEFAULT_MODELS: "mistral-small"
+      DEFAULT_MODELS: "mistral-medium"
       # ⚠️ Mettre "true" pour créer le premier compte admin, puis repasser à "false"
       ENABLE_SIGNUP: "false"
       # RAG : pas de modèle d'embeddings via ILaaS

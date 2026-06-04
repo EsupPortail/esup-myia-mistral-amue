@@ -10,7 +10,7 @@ Stack open source pour déployer une IA souveraine type ChatGPT ou Claude, basé
 
 | Composant | Rôle |
 |---|---|
-| [Mistral AI](https://mistral.ai) | Modèles LLM souverains (via clé AMUE) |
+| [Mistral AI](https://mistral.ai) via [ILaaS](https://www.ilaas.fr/services-inference/) | Mistral Medium 3 souverain (accord AMUE — endpoint `llm.ilaas.fr`) |
 | [LiteLLM](https://litellm.ai) | Passerelle API, quotas, load-balancing |
 | [OpenWebUI](https://github.com/open-webui/open-webui) | Interface utilisateur type ChatGPT |
 | [PostgreSQL](https://www.postgresql.org) | Persistance logs, budgets, clés |
@@ -27,13 +27,15 @@ cd esup-myia-mistral-amue
 
 # 2. Copier et remplir le fichier de config
 cp .env.example .env
-# Éditer .env avec vos secrets
+# Éditer .env : renseigner ILAAS_API_KEY (clé fournie par votre référent AMUE)
+# Option clé Mistral standard (non ILaaS) : voir les commentaires dans .env et config/litellm_config.yaml
 
 # 3. Créer les dossiers de données
 mkdir -p data/{postgres,redis,openwebui}
 
 # 4. Lancer
-docker compose up -d
+docker compose up -d          # Linux / serveur
+# docker compose -f docker-compose.macos.yml up -d   # macOS Apple Silicon
 
 # 5. Ouvrir l'interface
 open http://localhost:3000
@@ -73,6 +75,8 @@ open http://localhost:3000
 - [Wiki GT IA Esup](https://www.esup-portail.org/wiki/x/BgDLVg)
 - [Canal RocketChat GT IA](https://rocket.esup-portail.org/channel/GT-IA)
 - [Liste de diffusion](mailto:myia@groupes.renater.fr)
+- [ILaaS — Service d'inférence LLM](https://www.ilaas.fr/services-inference/)
+- [ILaaS — Service STT asynchrone](https://www.ilaas.fr/services-de-retranscription/)
 
 ---
 

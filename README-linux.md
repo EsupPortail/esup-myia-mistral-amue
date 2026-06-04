@@ -11,9 +11,13 @@
 
 ---
 
-> **Contexte** : Ce tutoriel s'appuie sur les Ateliers IA Esup 2025/2026 (Université de Rennes / Université de Strasbourg) pour assembler une stack complète type ChatGPT souverain. Le choix architectural retenu ici est d'utiliser l'API Mistral via la clé négociée par l'AMUE pour l'enseignement supérieur français — ce qui permet de démarrer sans infrastructure GPU et avec un haut niveau de souveraineté (données hébergées en Europe, opérateur français). Si votre établissement dispose de GPU et souhaite une indépendance totale vis-à-vis de toute API externe, la brique Mistral API peut être remplacée par un moteur vLLM local — la configuration est décrite dans l'Atelier 2 Esup.
+> **Contexte** : Ce tutoriel s'appuie sur les Ateliers IA Esup 2025/2026 (Université de Rennes / Université de Strasbourg) pour assembler une stack complète type ChatGPT souverain. Le choix architectural retenu ici est d'utiliser l'API Mistral via l'infrastructure ILaaS négociée par l'AMUE pour l'enseignement supérieur français — ce qui permet de démarrer sans infrastructure GPU et avec un haut niveau de souveraineté (données hébergées en Europe, opérateur français). Si votre établissement dispose de GPU et souhaite une indépendance totale vis-à-vis de toute API externe, la brique Mistral API peut être remplacée par un moteur vLLM local — la configuration est décrite dans l'Atelier 2 Esup.
 >
-> Si vous disposez d'une clé Mistral hors accord AMUE, vous pouvez a priori l'utiliser en lieu et place de la clé Mistral-AMUE dans votre fichier `.env`. Dans la configuration LiteLLM, l'api_base reste identique : `api_base: https://api.mistral.ai/v1`
+> **Modèle disponible via l'accord AMUE** : Mistral Medium 3 (`mistral-medium-250523`), hébergé sur l'infrastructure souveraine ILaaS du CINES. Température recommandée : 0.1 ou inférieure.
+>
+> **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI (Admin → Settings → Documents).
+>
+> Si vous disposez d'une clé Mistral standard (hors accord AMUE/ILaaS), vous pouvez l'utiliser : les blocs commentés dans `config/litellm_config.yaml` et `.env.example` vous permettent de basculer facilement — décommentez `MISTRAL_API_KEY` et les modèles avec `api_base: https://api.mistral.ai/v1`.
 
 ---
 
@@ -37,9 +41,9 @@
 | RAM | 8 Go | 16 Go |
 | Disque | 20 Go SSD | 50 Go SSD |
 | OS | Ubuntu 22.04 LTS ou Debian 12 | Ubuntu 24.04 LTS ou Debian 12 |
-| Réseau | Accès HTTPS sortant vers api.mistral.ai | + nom de domaine propre |
+| Réseau | Accès HTTPS sortant vers llm.ilaas.fr | + nom de domaine propre |
 
-> Pas de GPU requis : les inférences sont déléguées à l'API Mistral (cloud souverain français).
+> Pas de GPU requis : les inférences sont déléguées à l'API ILaaS (cloud souverain français).
 
 ### Logiciels requis
 
@@ -49,9 +53,13 @@
 
 ### Accès & Clés
 
-- **Clé API Mistral AMUE** : fournie par votre référent numérique via le dispositif AMUE.
+- **Clé API ILaaS (Mistral AMUE)** : fournie par votre référent numérique via le dispositif AMUE.
   Forme attendue : `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-  Endpoint de base : `https://api.mistral.ai/v1` (ou endpoint AMUE dédié si communiqué)
+  Endpoint de base : `https://llm.ilaas.fr/v1` — [documentation ILaaS](https://www.ilaas.fr/services-inference/)
+  Modèle disponible : **Mistral Medium 3** (`mistral-medium-250523`)
+
+- **Option Mistral standard** : si vous n'avez pas de clé ILaaS, une clé Mistral classique (mistral.ai) fonctionne aussi. Voir les blocs commentés dans `config/litellm_config.yaml` et `.env.example`.
+
 - **Accès SSH** au serveur cible
 - **Droits sudo** sur le serveur
 
@@ -65,7 +73,7 @@
 
 ### RGPD
 
-> Avant de démarrer : les prompts que vous envoyez transitent vers les serveurs de Mistral AI pour traitement. Mistral est un opérateur français, les données sont hébergées en Europe, et l'accord AMUE prévoit la non-utilisation de vos données pour le réentraînement des modèles — mais vérifiez ce point avec votre DPO avant tout usage impliquant des données sensibles. Ne faites jamais transiter de données personnelles d'étudiants ou d'agents via cet outil sans analyse préalable.
+> Avant de démarrer : les prompts que vous envoyez transitent vers les serveurs de Mistral AI via l'infrastructure ILaaS (CINES) pour traitement. Mistral est un opérateur français, les données sont hébergées en Europe, et l'accord AMUE prévoit la non-utilisation de vos données pour le réentraînement des modèles — mais vérifiez ce point avec votre DPO avant tout usage impliquant des données sensibles. Ne faites jamais transiter de données personnelles d'étudiants ou d'agents via cet outil sans analyse préalable.
 
 ---
 
@@ -97,15 +105,14 @@
                                            │ HTTPS
                                            ▼
                             ┌──────────────────────────────┐
-                            │  API Mistral (AMUE)           │
-                            │  mistral-large / small /      │
-                            │  codestral / embed...         │
+                            │  API ILaaS — llm.ilaas.fr     │
+                            │  Mistral Medium 3 (AMUE)      │
                             └──────────────────────────────┘
 ```
 
 **Pourquoi cette pile ?**
 
-- **Mistral AI** : modèles français, données hébergées en Europe, conformité RGPD facilitée
+- **Mistral AI via ILaaS (CINES)** : modèles français, données hébergées en Europe, conformité RGPD facilitée
 - **LiteLLM** : passerelle open source qui uniformise l'accès, gère les quotas par utilisateur/équipe, et permet d'ajouter d'autres modèles sans changer l'interface
 - **OpenWebUI** : interface open source type ChatGPT, supporte RAG, SSO, outils, gestion des espaces de travail
 - **PostgreSQL + Redis** : persistance des logs, budgets, sessions — aucune donnée ne sort du périmètre établissement
@@ -114,7 +121,7 @@
 
 ## 3. Mise en place pas à pas
 
-> Tous les fichiers sont créés dans `~/chatia-amue`. C'est le répertoire de travail pour toute la suite.
+> Tous les fichiers de configuration sont dans le repo cloné. Le répertoire de travail est `~/myia`.
 
 ### Étape 1 — Préparer le serveur
 
@@ -133,244 +140,72 @@ newgrp docker
 # Vérification
 docker --version          # Docker version 24+
 docker compose version    # Docker Compose version v2+
-
-# Créer l'arborescence du projet
-mkdir -p ~/chatia-amue/{config,data/{litellm,openwebui,postgres,redis}}
-cd ~/chatia-amue
 ```
 
 ---
 
-### Étape 2 — Fichier de configuration LiteLLM
+### Étape 2 — Cloner le repo
 
-Créer `config/litellm_config.yaml` :
+```bash
+git clone https://github.com/nicktruch/esup-myia-mistral-amue.git ~/myia
+cd ~/myia
 
-```yaml
-general_settings:
-  store_model_in_db: true
-
-litellm_settings:
-  num_retries: 3
-  request_timeout: 3600
-  allowed_fails: 5
-  cooldown_time: 30
-  drop_params: true
-  cache: true
-  cache_params:
-    type: redis
-    host: redis
-    port: 6379
-    password: os.environ/REDIS_PASSWORD
-
-model_list:
-
-  # Mistral Large — modèle principal, le plus capable
-  - model_name: mistral-large
-    litellm_params:
-      model: mistral/mistral-large-latest
-      api_key: os.environ/MISTRAL_API_KEY
-      api_base: https://api.mistral.ai/v1            # remplacer si endpoint AMUE dédié
-    model_info:
-      max_tokens: 131072
-      max_input_tokens: 128000
-      max_output_tokens: 4096
-      description: "Mistral Large — modèle puissant (AMUE)"
-
-  # Mistral Small — plus rapide, moins coûteux, idéal pour tâches simples
-  - model_name: mistral-small
-    litellm_params:
-      model: mistral/mistral-small-latest
-      api_key: os.environ/MISTRAL_API_KEY
-      api_base: https://api.mistral.ai/v1
-    model_info:
-      max_tokens: 32768
-      max_input_tokens: 32000
-      max_output_tokens: 4096
-      description: "Mistral Small — rapide et économique (AMUE)"
-
-  # Codestral — spécialisé code
-  - model_name: codestral
-    litellm_params:
-      model: mistral/codestral-latest
-      api_key: os.environ/MISTRAL_API_KEY
-      api_base: https://api.mistral.ai/v1
-    model_info:
-      max_tokens: 32768
-      description: "Codestral — assistance à la programmation (AMUE)"
-
-  # Mistral Embed — modèle d'embeddings pour le RAG
-  - model_name: mistral-embed
-    litellm_params:
-      model: mistral/mistral-embed
-      api_key: os.environ/MISTRAL_API_KEY
-      api_base: https://api.mistral.ai/v1
-    model_info:
-      mode: embedding
-      description: "Embeddings Mistral pour le RAG"
+# Créer les répertoires de données
+mkdir -p data/{postgres,redis,openwebui}
 ```
 
-> **Note AMUE** : Si l'AMUE vous a communiqué un endpoint dédié (ex: `https://api.amue-mistral.fr/v1`), remplacez tous les `api_base` en conséquence.
+Le repo contient déjà tous les fichiers nécessaires :
+- `docker-compose.yml` — stack Linux / serveur
+- `config/litellm_config.yaml` — modèles et paramètres LiteLLM (préconfiguré pour ILaaS)
+- `.env.example` — template de configuration à copier
 
 ---
 
 ### Étape 3 — Fichier d'environnement
 
-Créer le fichier `.env` dans `~/chatia-amue` (à ne jamais committer dans un dépôt public) :
+Copier le template et remplir les secrets :
 
 ```bash
-cat > .env << 'EOF'
-# === MISTRAL AMUE ===
-MISTRAL_API_KEY=sk-votre-cle-mistral-amue-ici
-
-# === LITELLM ===
-LITELLM_MASTER_KEY=sk-master-CHANGEZ-MOI-en-prod
-LITELLM_SECRET_KEY=jwt-secret-CHANGEZ-MOI-aussi
-
-# === POSTGRESQL ===
-POSTGRES_USER=litellm
-POSTGRES_PASSWORD=pgpassword-securise-CHANGEZ
-POSTGRES_DB=litellm
-
-# === REDIS ===
-REDIS_PASSWORD=redis-password-CHANGEZ
-
-# === OPENWEBUI ===
-WEBUI_SECRET_KEY=openwebui-secret-CHANGEZ
-WEBUI_NAME=ChatIA — Mon Université
-WEBUI_URL=https://chat.votre-etablissement.fr
-
-# === PORTS (modifiables si conflit sur l'hôte) ===
-PORT_OWUI=3000
-PORT_LITELLM=4000
-
-# === VOLUMES (chemins sur l'hôte) ===
-VOL_DATA_POSTGRES=./data/postgres
-VOL_DATA_REDIS=./data/redis
-VOL_DATA_OPENWEBUI=./data/openwebui
-EOF
-
-# Sécuriser les permissions
+cp .env.example .env
 chmod 600 .env
 ```
 
+Ouvrir `.env` dans un éditeur et remplacer **toutes** les valeurs de substitution :
+
+| Variable | Rôle | Valeur |
+|---|---|---|
+| `ILAAS_API_KEY` | Clé API ILaaS fournie par l'AMUE | Votre vraie clé `sk-xxx...` |
+| `LITELLM_MASTER_KEY` | Clé admin LiteLLM | `sk-` + 32 caractères aléatoires |
+| `LITELLM_SECRET_KEY` | Secret JWT interne | Chaîne aléatoire longue |
+| `POSTGRES_PASSWORD` | Mot de passe base de données | Chaîne aléatoire |
+| `REDIS_PASSWORD` | Mot de passe cache Redis | Chaîne aléatoire |
+| `WEBUI_SECRET_KEY` | Secret session OpenWebUI | Chaîne aléatoire |
+| `WEBUI_NAME` | Nom affiché dans l'interface | Ex: `MyIA — Université de Strasbourg` |
+| `WEBUI_URL` | URL publique future de l'instance | Ex: `https://chat.votre-etablissement.fr` |
+
+Pour générer des valeurs robustes directement dans le Terminal :
+
+```bash
+for i in 1 2 3 4 5 6; do python3 -c "import secrets; print(secrets.token_urlsafe(32))"; done
+```
+
+> ⚠️ Remplir le `.env` **avant** `docker compose up -d`. Une fois PostgreSQL démarré une première fois, les mots de passe sont gravés en base et ne peuvent plus être changés sans réinitialiser les données.
+
+> **Option Mistral standard** : si vous utilisez une clé Mistral classique (hors accord AMUE/ILaaS), décommentez la ligne `# MISTRAL_API_KEY` dans le `.env` et adaptez `config/litellm_config.yaml` (voir les blocs commentés dans ce fichier).
+
 ---
 
-### Étape 4 — Docker Compose complet
+### Étape 4 — Vérifier la configuration LiteLLM
 
-Créer `docker-compose.yml` dans `~/chatia-amue` :
+Le fichier `config/litellm_config.yaml` est préconfiguré pour l'endpoint ILaaS :
 
-```yaml
+- **Endpoint actif** : `https://llm.ilaas.fr/v1`
+- **Variable de clé** : `ILAAS_API_KEY`
+- **Modèle disponible via ILaaS AMUE** : `mistral-medium` (Mistral Medium 3 — `mistral-medium-250523`)
+- **Température** : 0.1 (recommandé par ILaaS)
+- **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI
 
-
-services:
-
-  # ─────────────────────────────────
-  # Base de données PostgreSQL
-  # ─────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - ${VOL_DATA_POSTGRES}:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    networks:
-      - nw_llm
-
-  # ─────────────────────────────────
-  # Cache Redis
-  # ─────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: redis-server --requirepass ${REDIS_PASSWORD} --save 60 1
-    volumes:
-      - ${VOL_DATA_REDIS:-./data/redis}:/data
-    networks:
-      - nw_llm
-    healthcheck:
-      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  # ─────────────────────────────────
-  # LiteLLM — passerelle API
-  # ─────────────────────────────────
-  litellm:
-    image: ghcr.io/berriai/litellm:main-latest
-    restart: unless-stopped
-    ports:
-      - "${PORT_LITELLM:-4000}:4000"
-    environment:
-      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
-      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
-      LITELLM_SECRET: ${LITELLM_SECRET_KEY}
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      STORE_MODEL_IN_DB: "True"
-    volumes:
-      - ./config/litellm_config.yaml:/app/config.yaml:ro
-    command: ["--config", "/app/config.yaml", "--port", "4000"]
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - nw_llm
-
-  # ─────────────────────────────────
-  # OpenWebUI — interface utilisateur
-  # ─────────────────────────────────
-  openwebui:
-    image: ghcr.io/open-webui/open-webui:main
-    restart: unless-stopped
-    ports:
-      - "${PORT_OWUI:-3000}:8080"
-    environment:
-      # Connexion à LiteLLM (mode OpenAI compatible)
-      OPENAI_API_BASE_URL: http://litellm:4000/v1
-      OPENAI_API_KEY: ${LITELLM_MASTER_KEY}
-      # Interface
-      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
-      WEBUI_NAME: ${WEBUI_NAME}
-      WEBUI_URL: ${WEBUI_URL}
-      # Modèle par défaut
-      DEFAULT_MODELS: "mistral-large"
-      # ⚠️ Mettre "true" pour créer le premier compte admin, puis repasser à "false"
-      ENABLE_SIGNUP: "false"
-      # Modèle d'embeddings pour le RAG interne
-      RAG_EMBEDDING_ENGINE: "openai"
-      RAG_EMBEDDING_MODEL: "mistral-embed"
-      RAG_OPENAI_API_BASE_URL: http://litellm:4000/v1
-      RAG_OPENAI_API_KEY: ${LITELLM_MASTER_KEY}
-      # Désactiver la télémétrie
-      SCARF_NO_ANALYTICS: "true"
-      DO_NOT_TRACK: "true"
-      ANONYMIZED_TELEMETRY: "false"
-    volumes:
-      - ${VOL_DATA_OPENWEBUI:-./data/openwebui}:/app/backend/data
-    depends_on:
-      litellm:
-        condition: service_started
-    networks:
-      - nw_llm
-
-networks:
-  nw_llm:
-    driver: bridge
-```
+Aucune modification n'est nécessaire si vous avez une clé ILaaS. Pour basculer sur une clé Mistral standard (accès à `mistral-large`, `codestral`, `mistral-embed`...), commentez le bloc ILaaS et décommentez les blocs `MISTRAL_API_KEY / https://api.mistral.ai/v1` dans ce fichier.
 
 ---
 
@@ -378,7 +213,7 @@ networks:
 
 ```bash
 # Se placer dans le répertoire du projet
-cd ~/chatia-amue
+cd ~/myia
 
 # Lancer tous les services
 docker compose up -d
@@ -397,11 +232,11 @@ docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 Résultat attendu — tous les services doivent afficher `healthy` :
 
 ```
-NAME                    STATUS                    PORTS
-chatia-amue-postgres    Up X minutes (healthy)    5432/tcp
-chatia-amue-redis       Up X minutes (healthy)    6379/tcp
-chatia-amue-litellm     Up X minutes (healthy)    0.0.0.0:4000->4000/tcp
-chatia-amue-openwebui   Up X minutes (healthy)    0.0.0.0:3000->8080/tcp
+NAME                 STATUS                    PORTS
+myia-postgres        Up X minutes (healthy)    5432/tcp
+myia-redis           Up X minutes (healthy)    6379/tcp
+myia-litellm         Up X minutes (healthy)    0.0.0.0:4000->4000/tcp
+myia-openwebui       Up X minutes (healthy)    0.0.0.0:3000->8080/tcp
 ```
 
 ---
@@ -436,7 +271,7 @@ docker compose logs --tail=50 openwebui
 
 ---
 
-### 4.2 — LiteLLM reçoit-il bien la clé Mistral ?
+### 4.2 — LiteLLM reçoit-il bien la clé ILaaS ?
 
 ```bash
 curl -s \
@@ -444,11 +279,11 @@ curl -s \
   http://localhost:4000/health | python3 -m json.tool
 ```
 
-La réponse doit contenir un statut `healthy` pour chaque modèle configuré. Si un modèle remonte `unhealthy`, c'est généralement la clé AMUE qui est incorrecte ou l'endpoint qui ne répond pas — vérifier la valeur de `MISTRAL_API_KEY` dans le `.env`.
+La réponse doit contenir un statut `healthy` pour le modèle `mistral-medium`. Si le modèle remonte `unhealthy`, c'est généralement la clé ILaaS qui est incorrecte ou l'endpoint qui ne répond pas — vérifier la valeur de `ILAAS_API_KEY` dans le `.env`.
 
 ---
 
-### 4.3 — Les modèles Mistral sont-ils bien exposés ?
+### 4.3 — Le modèle Mistral est-il bien exposé ?
 
 ```bash
 curl -s \
@@ -456,24 +291,23 @@ curl -s \
   http://localhost:4000/models | python3 -m json.tool
 ```
 
-On doit voir les quatre modèles déclarés dans `litellm_config.yaml` :
+On doit voir le modèle déclaré dans `config/litellm_config.yaml` (config ILaaS par défaut) :
 
 ```json
 {
   "data": [
-    {"id": "mistral-large",  "object": "model"},
-    {"id": "mistral-small",  "object": "model"},
-    {"id": "codestral",      "object": "model"},
-    {"id": "mistral-embed",  "object": "model"}
+    {"id": "mistral-medium", "object": "model"}
   ]
 }
 ```
+
+> Avec une clé Mistral standard, vous verriez également `mistral-large`, `codestral` et `mistral-embed`.
 
 ---
 
 ### 4.4 — Le chat fonctionne-t-il de bout en bout ?
 
-Ce script Python parcourt tous les cas essentiels en une seule passe.
+Ce script Python vérifie les cas essentiels en une seule passe.
 
 ```python
 # recette.py
@@ -496,7 +330,7 @@ def check(label, fn):
 
 def test_chat():
     rep = client.chat.completions.create(
-        model="mistral-large",
+        model="mistral-medium",
         messages=[
             {"role": "system", "content": "Tu es un assistant de l'ESR français."},
             {"role": "user",   "content": "Dis bonjour en une phrase."}
@@ -509,7 +343,7 @@ def test_chat():
 def test_streaming():
     tokens = []
     stream = client.chat.completions.create(
-        model="mistral-small",
+        model="mistral-medium",
         messages=[{"role": "user", "content": "Compte de 1 à 3."}],
         stream=True
     )
@@ -519,26 +353,9 @@ def test_streaming():
             tokens.append(delta)
     assert tokens, "Aucun token reçu en streaming"
 
-def test_codestral():
-    rep = client.chat.completions.create(
-        model="codestral",
-        messages=[{"role": "user", "content": "Écris une fonction Python qui retourne la somme de deux entiers."}],
-        max_tokens=100
-    )
-    assert "def " in rep.choices[0].message.content, "Pas de code Python dans la réponse"
-
-def test_embeddings():
-    emb = client.embeddings.create(
-        model="mistral-embed",
-        input=["test embedding"]
-    )
-    assert len(emb.data[0].embedding) > 0, "Vecteur vide"
-
-print("=== Recette ChatIA AMUE ===\n")
-check("Chat simple (mistral-large)",     test_chat)
-check("Streaming (mistral-small)",       test_streaming)
-check("Génération de code (codestral)", test_codestral)
-check("Embeddings RAG (mistral-embed)", test_embeddings)
+print("=== Recette MyIA AMUE ===\n")
+check("Chat simple (mistral-medium)",    test_chat)
+check("Streaming (mistral-medium)",      test_streaming)
 
 print(f"\n{'✅ Recette réussie — passage en production possible.' if ok else '❌ Des tests ont échoué — ne pas passer en production.'}")
 sys.exit(0 if ok else 1)
@@ -558,15 +375,19 @@ Ouvrir http://localhost:3000 et dérouler les vérifications suivantes dans l'or
 **Connexion et accès**
 - [ ] La page de connexion s'affiche sans erreur
 - [ ] La création du compte administrateur (premier lancement) fonctionne
-- [ ] Après connexion, les modèles `mistral-large`, `mistral-small` et `codestral` apparaissent dans le menu déroulant
+- [ ] Après connexion, le modèle `mistral-medium` apparaît dans le menu déroulant
 
 **Conversation**
 - [ ] Envoyer *"Bonjour, qui es-tu ?"* → la réponse s'affiche en streaming, en français
 - [ ] Le compteur de tokens apparaît sous la réponse (activer dans Paramètres si besoin)
-- [ ] Changer de modèle en cours de conversation et constater que la réponse change de style
 
 **RAG — Retrieval Augmented Generation**
-- [ ] Cliquer sur l'icône trombone et uploader un PDF (ex: le règlement intérieur de votre établissement)
+
+> Les embeddings ne sont pas disponibles via ILaaS. Pour activer le RAG, configurer Ollama + `nomic-embed-text` dans OpenWebUI :
+> - Installer Ollama et lancer `ollama pull nomic-embed-text`
+> - OpenWebUI : **Admin → Settings → Documents** → Embedding Engine : `Ollama` → URL : `http://host.docker.internal:11434` (Linux : IP hôte, ex: `172.17.0.1`)
+
+- [ ] Uploader un PDF (ex: le règlement intérieur de votre établissement) via l'icône trombone
 - [ ] Poser une question dont la réponse se trouve dans ce document
 - [ ] Vérifier que la réponse cite correctement le document et n'hallucine pas
 
@@ -577,44 +398,7 @@ Ouvrir http://localhost:3000 et dérouler les vérifications suivantes dans l'or
 
 ---
 
-### 4.6 — Le fallback fonctionne-t-il en cas de panne ?
-
-Ce test vérifie que LiteLLM bascule automatiquement sur `mistral-small` si `mistral-large` devient indisponible, sans interruption de service.
-
-Simuler une panne du modèle principal en le commentant temporairement dans `config/litellm_config.yaml` :
-
-```yaml
-# - model_name: mistral-large
-#   litellm_params:
-#   ...
-```
-
-Redémarrer LiteLLM :
-
-```bash
-docker compose restart litellm
-```
-
-Envoyer une requête sur `mistral-large` et vérifier que la réponse arrive quand même via le fallback :
-
-```bash
-curl -X POST http://localhost:4000/chat/completions \
-  -H "Authorization: Bearer sk-master-CHANGEZ-MOI-en-prod" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "mistral-large", "messages": [{"role": "user", "content": "test fallback"}]}'
-```
-
-Vérifier le basculement dans les logs :
-
-```bash
-docker compose logs litellm | grep -i fallback
-```
-
-Remettre la config d'origine et redémarrer avant de passer en production.
-
----
-
-### 4.7 — Que faire si quelque chose ne va pas ?
+### 4.6 — Que faire si quelque chose ne va pas ?
 
 | Symptôme | Cause probable | Action |
 |---|---|---|
@@ -622,7 +406,7 @@ Remettre la config d'origine et redémarrer avant de passer en production.
 | Erreur 401 sur `/health` | Mauvaise valeur de `LITELLM_MASTER_KEY` | Vérifier le `.env` et redémarrer |
 | Erreur 429 ou `quota exceeded` | Clé AMUE épuisée ou trop de requêtes | Contacter votre référent AMUE |
 | Modèles absents dans OpenWebUI | OpenWebUI ne joint pas LiteLLM | Vérifier les logs OpenWebUI, tester `curl http://litellm:4000/models` depuis le conteneur |
-| RAG sans résultat pertinent | Modèle d'embedding non configuré | Vérifier les variables `RAG_EMBEDDING_*` dans `docker-compose.yml` |
+| RAG sans résultat pertinent | Modèle d'embedding non configuré | Configurer Ollama + nomic-embed-text dans Admin → Settings → Documents |
 | Streaming coupé au bout de 30s | Timeout nginx trop court | Augmenter `proxy_read_timeout` à 600s dans la config Nginx |
 | Impossible de créer le compte admin | `ENABLE_SIGNUP: "false"` | Passer à `"true"` le temps de créer le compte, puis remettre à `"false"` |
 
@@ -630,7 +414,7 @@ Remettre la config d'origine et redémarrer avant de passer en production.
 
 ## 5. Et ensuite ?
 
-Votre instance ChatIA est maintenant fonctionnelle en local. Vous pouvez vous connecter sur http://localhost:3000, dialoguer avec les modèles Mistral, et tester le RAG avec vos propres documents.
+Votre instance MyIA est maintenant fonctionnelle en local. Vous pouvez vous connecter sur http://localhost:3000, dialoguer avec Mistral Medium 3, et tester le RAG avec vos propres documents.
 
 C'est suffisant pour expérimenter, former vos collègues et valider l'intérêt de la solution dans votre contexte.
 
@@ -643,4 +427,4 @@ Pour déployer cette stack dans votre établissement et l'ouvrir à vos utilisat
 
 ---
 
-*Tutoriel rédigé dans le cadre des Ateliers IA Esup 2025/2026 — basé sur les briques open source LiteLLM, OpenWebUI et l'offre Mistral AMUE.*
+*Tutoriel rédigé dans le cadre des Ateliers IA Esup 2025/2026 — basé sur les briques open source LiteLLM, OpenWebUI et l'offre Mistral AMUE via ILaaS (CINES).*
