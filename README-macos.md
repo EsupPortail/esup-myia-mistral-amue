@@ -8,7 +8,7 @@
 
 > **Contexte** : Ce tutoriel permet d'installer la stack MyIA souveraine (Mistral AMUE via ILaaS + LiteLLM + OpenWebUI) sur un MacBook Air M2 pour expérimentation locale. L'objectif est d'avoir une instance fonctionnelle sur votre poste en moins d'une heure, sans serveur Linux.
 >
-> **Modèle disponible via l'accord AMUE** : Mistral Medium 3 (`mistral-medium-250523`), hébergé sur l'infrastructure souveraine ILaaS du CINES. Température recommandée : 0.1 ou inférieure.
+> **Modèle disponible via l'accord AMUE** : Mistral Medium 3 (`mistral-medium-latest`), hébergé sur l'infrastructure souveraine ILaaS du CINES. Température recommandée : 0.1 ou inférieure.
 >
 > **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI (voir étape 6b).
 
@@ -54,7 +54,7 @@
 - **Clé API ILaaS (Mistral AMUE)** : fournie par votre référent numérique via le dispositif AMUE.
   Forme attendue : `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
   Endpoint de base : `https://llm.ilaas.fr/v1` — [documentation ILaaS](https://www.ilaas.fr/services-inference/)
-  Modèle disponible : **Mistral Medium 3** (`mistral-medium-250523`)
+  Modèle disponible : **Mistral Medium 3** (`mistral-medium-latest`)
 
 - **Option Mistral standard** : si vous n'avez pas encore de clé ILaaS, une clé Mistral classique (mistral.ai) fonctionne aussi. Voir les blocs commentés dans `config/litellm_config.yaml` et `.env.example`.
 
@@ -205,7 +205,7 @@ Le fichier `config/litellm_config.yaml` est préconfiguré pour l'endpoint ILaaS
 
 - **Endpoint actif** : `https://llm.ilaas.fr/v1`
 - **Variable de clé** : `ILAAS_API_KEY`
-- **Modèle disponible via ILaaS AMUE** : `mistral-medium` (Mistral Medium 3 — `mistral-medium-250523`)
+- **Modèle disponible via ILaaS AMUE** : `mistral-medium` (Mistral Medium 3 — `mistral-medium-latest`)
 - **Température** : 0.1 (recommandé par ILaaS)
 - **RAG / embeddings** : non disponibles via ILaaS — voir étape 6b pour Ollama
 

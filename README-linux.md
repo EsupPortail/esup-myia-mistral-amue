@@ -13,7 +13,7 @@
 
 > **Contexte** : Ce tutoriel s'appuie sur les Ateliers IA Esup 2025/2026 (Université de Rennes / Université de Strasbourg) pour assembler une stack complète type ChatGPT souverain. Le choix architectural retenu ici est d'utiliser l'API Mistral via l'infrastructure ILaaS négociée par l'AMUE pour l'enseignement supérieur français — ce qui permet de démarrer sans infrastructure GPU et avec un haut niveau de souveraineté (données hébergées en Europe, opérateur français). Si votre établissement dispose de GPU et souhaite une indépendance totale vis-à-vis de toute API externe, la brique Mistral API peut être remplacée par un moteur vLLM local — la configuration est décrite dans l'Atelier 2 Esup.
 >
-> **Modèle disponible via l'accord AMUE** : Mistral Medium 3 (`mistral-medium-250523`), hébergé sur l'infrastructure souveraine ILaaS du CINES. Température recommandée : 0.1 ou inférieure.
+> **Modèle disponible via l'accord AMUE** : Mistral Medium 3 (`mistral-medium-latest`), hébergé sur l'infrastructure souveraine ILaaS du CINES. Température recommandée : 0.1 ou inférieure.
 >
 > **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI (Admin → Settings → Documents).
 >
@@ -56,7 +56,7 @@
 - **Clé API ILaaS (Mistral AMUE)** : fournie par votre référent numérique via le dispositif AMUE.
   Forme attendue : `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
   Endpoint de base : `https://llm.ilaas.fr/v1` — [documentation ILaaS](https://www.ilaas.fr/services-inference/)
-  Modèle disponible : **Mistral Medium 3** (`mistral-medium-250523`)
+  Modèle disponible : **Mistral Medium 3** (`mistral-medium-latest`)
 
 - **Option Mistral standard** : si vous n'avez pas de clé ILaaS, une clé Mistral classique (mistral.ai) fonctionne aussi. Voir les blocs commentés dans `config/litellm_config.yaml` et `.env.example`.
 
@@ -201,7 +201,7 @@ Le fichier `config/litellm_config.yaml` est préconfiguré pour l'endpoint ILaaS
 
 - **Endpoint actif** : `https://llm.ilaas.fr/v1`
 - **Variable de clé** : `ILAAS_API_KEY`
-- **Modèle disponible via ILaaS AMUE** : `mistral-medium` (Mistral Medium 3 — `mistral-medium-250523`)
+- **Modèle disponible via ILaaS AMUE** : `mistral-medium` (Mistral Medium 3 — `mistral-medium-latest`)
 - **Température** : 0.1 (recommandé par ILaaS)
 - **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI
 

@@ -27,7 +27,7 @@ model_list:
 
   - model_name: mistral-medium
     litellm_params:
-      model: openai/mistral-medium-250523
+      model: openai/mistral-medium-latest
       api_key: os.environ/ILAAS_API_KEY
       api_base: https://llm.ilaas.fr/v1
       temperature: 0.1
