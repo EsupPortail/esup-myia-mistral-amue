@@ -49,7 +49,7 @@ open http://localhost:3000
 |---|---|
 | 🐧 Linux (Ubuntu / Debian) | [README-linux.md](README-linux.md) |
 | 🍎 macOS Apple Silicon (M2/M3) | [README-macos.md](README-macos.md) |
-| 🪟 Windows 11 | [README-windows.md](README-windows.md) |
+| 💻 Windows 11 | [README-windows.md](README-windows.md) |
 
 ---
 
