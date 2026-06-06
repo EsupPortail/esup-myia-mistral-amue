@@ -11,7 +11,7 @@
 >
 > **Modèle disponible via l'accord AMUE** : Mistral Medium 3 (`mistral-medium-latest`), hébergé sur l'infrastructure souveraine ILaaS du CINES. Température recommandée : 0.1 ou inférieure.
 >
-> **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI (voir étape 8).
+> **RAG / embeddings** : non disponibles via ILaaS — configurer Ollama + `nomic-embed-text` dans OpenWebUI (voir étape 9).
 
 ---
 
@@ -60,7 +60,7 @@
 
 - **Option Mistral standard** : si vous n'avez pas encore de clé ILaaS, une clé Mistral classique (mistral.ai) fonctionne aussi. Voir les blocs commentés dans `config/litellm_config.yaml` et `.env.example`.
 
-- **Sans clé du tout** : l'étape 8 décrit comment utiliser Ollama (modèle local) en attendant votre clé ILaaS.
+- **Sans clé du tout** : l'étape 9 décrit comment utiliser Ollama (modèle local) en attendant votre clé ILaaS.
 
 ### Compétences requises
 
@@ -123,6 +123,8 @@ Cette commande installe WSL2 et Ubuntu. **Redémarrer** le PC quand demandé.
 
 Après le redémarrage, Ubuntu se lance automatiquement pour finaliser l'installation (créer un utilisateur Linux). Une fois fait, vous pouvez fermer cette fenêtre.
 
+> **WSL2 déjà installé ?** Si la commande répond `Windows Subsystem for Linux is already installed`, exécuter simplement la vérification ci-dessous et passer à l'étape suivante.
+
 Vérification dans PowerShell :
 
 ```powershell
@@ -130,7 +132,7 @@ wsl --status
 wsl --list --verbose
 ```
 
-WSL version doit être 2. Si ce n'est pas le cas :
+La colonne VERSION doit afficher 2. Si ce n'est pas le cas :
 
 ```powershell
 wsl --set-default-version 2
@@ -183,12 +185,12 @@ git clone https://github.com/EsupPortail/esup-myia-mistral-amue.git $env:USERPRO
 cd $env:USERPROFILE\myia
 
 # Créer les répertoires de données
-New-Item -ItemType Directory -Force data\postgres, data\redis, data\openwebui
+mkdir data\postgres, data\redis, data\openwebui
 ```
 
 Le repo contient déjà tous les fichiers nécessaires :
 - `docker-compose.yml` — stack Linux/Windows compatible
-- `config\litellm_config.yaml` — modèles et paramètres LiteLLM (préconfiguré pour ILaaS)
+- `config/litellm_config.yaml` — modèles et paramètres LiteLLM (préconfiguré pour ILaaS)
 - `.env.example` — template de configuration à copier
 
 ---
@@ -232,19 +234,19 @@ Sauvegarder le fichier.
 
 > ⚠️ Remplir le `.env` **avant** `docker compose up -d`. Une fois PostgreSQL démarré une première fois, les mots de passe sont gravés en base et ne peuvent plus être changés sans réinitialiser les données.
 
-> **Option Mistral standard** : si vous utilisez une clé Mistral classique (hors accord AMUE/ILaaS), décommentez la ligne `# MISTRAL_API_KEY` dans le `.env` et adaptez `config\litellm_config.yaml` (voir les blocs commentés dans ce fichier).
+> **Option Mistral standard** : si vous utilisez une clé Mistral classique (hors accord AMUE/ILaaS), décommentez la ligne `# MISTRAL_API_KEY` dans le `.env` et adaptez `config/litellm_config.yaml` (voir les blocs commentés dans ce fichier).
 
 ---
 
 ### Étape 6 — Vérifier la configuration LiteLLM
 
-Le fichier `config\litellm_config.yaml` est préconfiguré pour l'endpoint ILaaS :
+Le fichier `config/litellm_config.yaml` est préconfiguré pour l'endpoint ILaaS :
 
 - **Endpoint actif** : `https://llm.ilaas.fr/v1`
 - **Variable de clé** : `ILAAS_API_KEY`
 - **Modèle disponible via ILaaS AMUE** : `mistral-medium` (Mistral Medium 3 — `mistral-medium-latest`)
 - **Température** : 0.1 (recommandé par ILaaS)
-- **RAG / embeddings** : non disponibles via ILaaS — voir étape 8 pour Ollama
+- **RAG / embeddings** : non disponibles via ILaaS — voir étape 9 pour Ollama
 
 Aucune modification n'est nécessaire si vous avez une clé ILaaS.
 
@@ -278,9 +280,11 @@ myia-openwebui   Up X minutes (healthy)    0.0.0.0:3000->8080/tcp
 
 > **Note timeouts** : Docker Desktop sur Windows utilise WSL2, ce qui ajoute une couche de virtualisation. Les migrations Prisma de LiteLLM peuvent prendre jusqu'à 2-3 minutes au premier démarrage.
 
+> **Pare-feu Windows** : au premier démarrage, Windows Defender peut afficher une alerte pour les ports 3000 et 4000. Cliquer sur **Autoriser l'accès** pour que les conteneurs soient accessibles depuis le navigateur.
+
 ---
 
-### Étape 7b — Configuration initiale OpenWebUI
+### Étape 8 — Configuration initiale OpenWebUI
 
 1. Ouvrir http://localhost:3000 dans Edge ou Chrome
 2. Créer le **compte administrateur** (premier compte = admin automatiquement)
@@ -289,7 +293,7 @@ myia-openwebui   Up X minutes (healthy)    0.0.0.0:3000->8080/tcp
 
 ---
 
-### Étape 8 — Tester avec Ollama en attendant la clé ILaaS
+### Étape 9 — Tester avec Ollama en attendant la clé ILaaS
 
 Si vous n'avez pas encore votre clé ILaaS, ou pour activer les **embeddings RAG** (non disponibles via ILaaS), vous pouvez utiliser Ollama.
 
@@ -309,7 +313,7 @@ ollama --version
 ollama pull qwen3:0.6b
 ```
 
-**Activer le modèle dans LiteLLM** — décommenter la section Ollama dans `config\litellm_config.yaml` :
+**Activer le modèle dans LiteLLM** — décommenter la section Ollama dans `config/litellm_config.yaml` :
 
 ```yaml
   - model_name: qwen3
@@ -369,7 +373,7 @@ docker compose logs --tail=50 openwebui
 # PowerShell 7+
 curl -s -H "Authorization: Bearer sk-master-CHANGEZ-MOI" http://localhost:4000/health
 
-# PowerShell 5 (alternatif)
+# PowerShell 5 (built-in)
 Invoke-RestMethod -Uri http://localhost:4000/health -Headers @{ Authorization = "Bearer sk-master-CHANGEZ-MOI" }
 ```
 
@@ -380,7 +384,11 @@ La réponse doit contenir un statut `healthy` pour `mistral-medium`. Si le modè
 ### 4.3 — Le modèle est-il bien exposé ?
 
 ```powershell
+# PowerShell 7+
 curl -s -H "Authorization: Bearer sk-master-CHANGEZ-MOI" http://localhost:4000/models
+
+# PowerShell 5 (built-in)
+Invoke-RestMethod -Uri http://localhost:4000/models -Headers @{ Authorization = "Bearer sk-master-CHANGEZ-MOI" }
 ```
 
 On doit voir `mistral-medium` dans la réponse.
@@ -459,7 +467,7 @@ Ouvrir http://localhost:3000 et dérouler les vérifications suivantes :
 **Conversation**
 - [ ] Envoyer *"Bonjour, qui es-tu ?"* → réponse en streaming, en français
 
-**RAG** (nécessite Ollama + nomic-embed-text configuré — voir étape 8)
+**RAG** (nécessite Ollama + nomic-embed-text configuré — voir étape 9)
 - [ ] Uploader un PDF via l'icône trombone dans le chat
 - [ ] Poser une question sur le contenu du document
 - [ ] Vérifier que la réponse cite le document sans halluciner
@@ -470,8 +478,9 @@ Ouvrir http://localhost:3000 et dérouler les vérifications suivantes :
 
 | Symptôme | Cause probable | Action |
 |---|---|---|
-| Docker Desktop ne démarre pas | WSL2 non activé ou virtualisation désactivée | Relancer `wsl --install` en admin et redémarrer ; vérifier la virtualisation dans le BIOS |
+| Docker Desktop ne démarre pas | WSL2 non activé ou virtualisation désactivée dans le BIOS | Relancer `wsl --install` en admin et redémarrer ; vérifier dans le BIOS que la virtualisation (VT-x/AMD-V) est activée |
 | `docker compose` non reconnu | Docker Desktop non démarré | Lancer Docker Desktop depuis le menu Démarrer |
+| http://localhost:3000 inaccessible | Pare-feu Windows a bloqué le port | Autoriser Docker Desktop dans Windows Defender Firewall (Panneau de configuration → Pare-feu → Autoriser une application) |
 | Conteneur `litellm` en `unhealthy` | PostgreSQL pas encore prêt | Attendre 30s, relancer `docker compose up -d` |
 | Erreur 401 sur `/health` | Mauvaise `LITELLM_MASTER_KEY` | Vérifier le `.env` et redémarrer |
 | Erreur 429 ou `quota exceeded` | Clé ILaaS épuisée | Contacter votre référent AMUE |
@@ -480,7 +489,7 @@ Ouvrir http://localhost:3000 et dérouler les vérifications suivantes :
 | Impossible de créer le compte admin | `ENABLE_SIGNUP: "false"` | Passer à `"true"` le temps de créer le compte, puis remettre à `"false"` |
 | Modèle Ollama inaccessible | Ollama non démarré | Vérifier que l'icône Ollama est présente dans la barre des tâches |
 | `host.docker.internal` ne répond pas | Docker Desktop non démarré | Relancer Docker Desktop |
-| Performances lentes (I/O) | Projet dans le système de fichiers Windows | Déplacer le projet vers le système de fichiers WSL2 (voir note ci-dessous) |
+| Performances lentes (I/O) | Projet dans le système de fichiers Windows | Déplacer le projet dans le système de fichiers WSL2 (voir note ci-dessous) |
 
 > **Note performances** : Docker Desktop sur Windows accède plus rapidement aux fichiers situés dans le système de fichiers WSL2 (`\\wsl$\Ubuntu\home\<user>\myia`) que dans le système de fichiers Windows (`C:\Users\...`). Si les performances sont insuffisantes, cloner le repo directement depuis un terminal Ubuntu WSL2.
 

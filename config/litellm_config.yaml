@@ -20,7 +20,7 @@ model_list:
   # ─── Configuration ILaaS (endpoint AMUE — par défaut) ───────────────────────
   # Endpoint  : https://llm.ilaas.fr/v1
   # Clé       : ILAAS_API_KEY dans le .env
-  # Modèle    : Mistral Medium 3 (mistral-medium-250523), hébergé CINES/ILaaS
+  # Modèle    : Mistral Medium 3 (mistral-medium-latest), hébergé CINES/ILaaS
   # Température recommandée : 0.1 ou inférieure
   # Pas d'embeddings RAG via ILaaS — utiliser Ollama + nomic-embed-text
   # (configurer dans OpenWebUI : Admin → Settings → Documents)
